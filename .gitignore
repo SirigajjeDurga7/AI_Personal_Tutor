@@ -2,3 +2,34 @@ node_modules/
 dist/
 .env
 .vscode/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+venv/
+venv311/
+.env
+
+# VS Code
+.vscode/
+
+# JetBrains
+.idea/
+
+# Build
+build/
+dist/
+
+# Logs
+*.log
+
+# Environment Variables
+.env
+.env.*
+
+# Database
+*.db
