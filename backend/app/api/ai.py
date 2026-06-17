@@ -9,6 +9,11 @@ from app.schemas.ai_schema import QuizRequest
 from app.ai.quiz_generator import generate_quiz
 from app.schemas.ai_schema import StudyPlanRequest
 from app.ai.study_planner import generate_study_plan
+from app.schemas.ai_schema import CareerRequest
+from app.schemas.ai_schema import RecommendationRequest
+from app.schemas.ai_schema import InterviewRequest
+from app.ai.recommendation import generate_recommendations
+from app.ai.interview import generate_mock_interview
 router = APIRouter(
     prefix="/ai",
     tags=["AI"]
@@ -54,4 +59,40 @@ async def study_plan(data: StudyPlanRequest):
 
     return {
         "study_plan": plan
+    }
+@router.post("/career-guidance")
+async def career_guidance(data: CareerRequest):
+
+    prompt = f"""
+    Skills: {data.skills}
+    Interest: {data.interest}
+
+    Suggest suitable careers.
+    Give short explanation.
+    """
+
+    answer = await ask_ai(prompt)
+
+    return {
+        "career_guidance": answer
+    }
+@router.post("/recommendations")
+async def recommendations(data: RecommendationRequest):
+
+    recommendations = await generate_recommendations(
+        data.weak_topics
+    )
+
+    return {
+        "recommendations": recommendations
+    }
+@router.post("/mock-interview")
+async def mock_interview(data: InterviewRequest):
+
+    questions = await generate_mock_interview(
+        data.domain
+    )
+
+    return {
+        "mock_interview": questions
     }
