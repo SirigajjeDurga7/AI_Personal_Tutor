@@ -1,0 +1,81 @@
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 520px;
+    background: white;
+    padding: 48px;
+    border-radius: 28px;
+    box-shadow:
+        0 12px 40px rgba(15, 23, 42, 0.08),
+        0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.login-card h1 {
+    color: #0B132B;
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.login-card p {
+    color: #5F6B85;
+}
+
+.login-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 32px;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 16px 18px;
+    border: 1.5px solid #dbe2ea;
+    border-radius: 14px;
+    background: white;
+    color: #0B132B;
+    font-size: 16px;
+}
+
+.login-card input::placeholder {
+    color: #94a3b8;
+}
+
+.login-card input:focus {
+    outline: none;
+    border-color: #5B6EF5;
+    box-shadow: 0 0 0 4px rgba(91,110,245,0.12);
+}
+
+.login-card button {
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    background: #5B6EF5;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.login-card button:hover {
+    background: #4F46E5;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.register-link a {
+    color: #5B6EF5;
+    text-decoration: none;
+    font-weight: 700;
+}

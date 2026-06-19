@@ -1,0 +1,84 @@
+.otp-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.otp-card {
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    padding: 48px;
+    border-radius: 28px;
+    box-shadow:
+        0 12px 40px rgba(15, 23, 42, 0.08),
+        0 2px 8px rgba(15, 23, 42, 0.04);
+    text-align: center;
+}
+
+.otp-card h1 {
+    color: #0B132B;
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.otp-card p {
+    color: #5F6B85;
+}
+
+.otp-card span {
+    display: block;
+    margin-top: 8px;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #5B6EF5;
+}
+
+.otp-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.otp-card input {
+    padding: 16px;
+    border: 1.5px solid #dbe2ea;
+    border-radius: 14px;
+    font-size: 18px;
+    text-align: center;
+    letter-spacing: 8px;
+}
+
+.otp-card input:focus {
+    outline: none;
+    border-color: #5B6EF5;
+    box-shadow: 0 0 0 4px rgba(91,110,245,0.12);
+}
+
+.otp-card button {
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    background: #5B6EF5;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.otp-card button:hover {
+    background: #4F46E5;
+}
+
+.timer {
+    margin-top: 24px;
+    color: #64748B;
+}
+
+.resend-btn {
+    margin-top: 24px;
+    background: transparent !important;
+    color: #5B6EF5 !important;
+}

@@ -135,8 +135,15 @@ function Home() {
     <p>Enroll, learn and get AI tutoring.</p>
 
     <div className="hero-role-actions">
-      <button>Login</button>
-      <button className="outline">Create Account</button>
+      <button onClick={() => navigate("/login/student")}>
+  Login
+</button>
+      <button
+  className="outline"
+  onClick={() => navigate("/register/student")}
+>
+  Create Account
+</button>
     </div>
   </div>
 
@@ -145,8 +152,15 @@ function Home() {
     <p>Create courses and monitor learners.</p>
 
     <div className="hero-role-actions">
-      <button>Login</button>
-      <button className="outline">Create Account</button>
+      <button onClick={() => navigate("/login/instructor")}>
+  Login
+</button>
+      <button
+  className="outline"
+  onClick={() => navigate("/register/instructor")}
+>
+  Create Account
+</button>
     </div>
   </div>
 
@@ -155,8 +169,15 @@ function Home() {
     <p>Govern users and analytics.</p>
 
     <div className="hero-role-actions">
-      <button>Login</button>
-      <button className="outline">Create Account</button>
+      <button onClick={() => navigate("/login/admin")}>
+  Login
+</button>
+      <button
+  className="outline"
+  onClick={() => navigate("/register/admin")}
+>
+  Create Account
+</button>
     </div>
   </div>
 
