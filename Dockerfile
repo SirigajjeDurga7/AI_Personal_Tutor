@@ -7,7 +7,8 @@ COPY frontend-app/ .
 RUN npm run build
 
 # Step 2: Set up the Python Backend Environment
-FROM python:3.11-slim
+FROM python:3.12-slim
+
 WORKDIR /app
 
 # Create a non-root user (Required for Hugging Face security rules)
