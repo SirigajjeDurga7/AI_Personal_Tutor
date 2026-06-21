@@ -20,34 +20,36 @@ function Login() {
   };
 
   const handleLogin = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await axios.post(
-      "http://localhost:8000/login",
-      {
-        email: formData.email,
-        password: formData.password,
-      }
-    );
+    try {
+      // Fixed: Pointing to relative path and passing the missing role parameter
+      const response = await axios.post(
+        "/login",
+        {
+          email: formData.email,
+          password: formData.password,
+          role: role,
+        }
+      );
 
-    alert(response.data.message);
+      alert(response.data.message);
 
-    navigate("/verify-otp", {
-      state: {
-        email: formData.email,
-        role,
-      },
-    });
+      navigate("/verify-otp", {
+        state: {
+          email: formData.email,
+          role,
+        },
+      });
 
-  } catch (error) {
-    console.log("Login Error:", error.response);
-alert(
-  error.response?.data?.message ||
-  "Login failed"
-);
-  }
-};
+    } catch (error) {
+      console.log("Login Error:", error.response);
+      alert(
+        error.response?.data?.message ||
+        "Login failed"
+      );
+    }
+  };
 
   return (
     <div className="login-container">
