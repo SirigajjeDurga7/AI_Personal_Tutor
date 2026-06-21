@@ -1,14 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
-import Register from "./pages/Register";
+import Register from "./pages/register"; // Changed to lowercase r to match your file name
 import Login from "./pages/Login";
 import VerifyOTP from "./pages/VerifyOTP";
 
 import StudentDashboard from "./pages/StudentDashboard";
 import InstructorDashboard from "./pages/InstructorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
-import Dashboard from "./pages/dashboard";
+import DashboardComponent from "./pages/dashboard"; // Renamed the import to avoid naming conflicts
 
 function App() {
   return (
@@ -33,7 +33,7 @@ function App() {
       />
       <Route path="/verify-otp" element={<VerifyOTP />} />
       {/* Smart redirect: /dashboard routes to role-specific dashboard */}
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard" element={<DashboardComponent />} />
     </Routes>
   );
 }
