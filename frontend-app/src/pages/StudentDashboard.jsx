@@ -11,7 +11,7 @@ import {
   Sparkles, CheckCircle, Trash2, Edit3, Send, Upload, Star
 } from "lucide-react";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = "";
 
 function StudentDashboard() {
   const navigate = useNavigate();
