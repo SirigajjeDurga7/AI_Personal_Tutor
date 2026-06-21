@@ -9,7 +9,7 @@ import {
   Search, Trash2, Edit3, UserPlus, ToggleLeft, ToggleRight, Info
 } from "lucide-react";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = "";
 
 function AdminDashboard() {
   const navigate = useNavigate();
