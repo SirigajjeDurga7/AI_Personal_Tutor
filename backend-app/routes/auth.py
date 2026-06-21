@@ -94,7 +94,7 @@ def login():
 
     if not bcrypt.checkpw(
         password.encode("utf-8"),
-        user["password"]
+        user["password"].encode("utf-8")
     ):
         return jsonify({
             "message": "Invalid password"
