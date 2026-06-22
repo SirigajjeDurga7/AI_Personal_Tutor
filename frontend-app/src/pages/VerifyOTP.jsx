@@ -27,9 +27,12 @@ function VerifyOTP() {
     e.preventDefault();
 
     try {
-      // Changed from localhost:8000 to production relative route path
+      // Dynamically fetches your live Hugging Face URL space
+      const baseUrl = window.location.origin;
+
+      // Connects directly to the live backend domain
       const response = await axios.post(
-        "/verify-otp",
+        `${baseUrl}/verify-otp`,
         {
           email,
           otp,
@@ -39,10 +42,7 @@ function VerifyOTP() {
       alert(response.data.message);
 
       // Save JWT Token
-      localStorage.setItem(
-        "token",
-        response.data.token
-      );
+      localStorage.setItem("token", response.data.token);
 
       // Save Current User
       localStorage.setItem(
@@ -64,35 +64,30 @@ function VerifyOTP() {
       }
 
     } catch (error) {
-      alert(
-        error.response?.data?.message ||
-        "OTP Verification Failed"
-      );
+      console.error("Verification Network Error Details:", error);
+      
+      if (!error.response) {
+        alert("Network error: Cannot reach the backend server.");
+      } else {
+        alert(error.response?.data?.message || "OTP Verification Failed");
+      }
     }
   };
 
   const handleResend = () => {
     setTimer(30);
-
     // We can implement resend later
     alert("Please login again to receive a new OTP.");
   };
 
   return (
     <div className="otp-container">
-
       <div className="otp-card">
-
         <h1>Verify OTP</h1>
-
-        <p>
-          Enter the OTP sent to
-        </p>
-
+        <p>Enter the OTP sent to</p>
         <span>{email}</span>
 
         <form onSubmit={handleVerify}>
-
           <input
             type="text"
             maxLength="6"
@@ -101,28 +96,17 @@ function VerifyOTP() {
             onChange={(e) => setOtp(e.target.value)}
             required
           />
-
-          <button type="submit">
-            Verify OTP
-          </button>
-
+          <button type="submit">Verify OTP</button>
         </form>
 
         {timer > 0 ? (
-          <p className="timer">
-            Resend OTP in {timer}s
-          </p>
+          <p className="timer">Resend OTP in {timer}s</p>
         ) : (
-          <button
-            className="resend-btn"
-            onClick={handleResend}
-          >
+          <button className="resend-btn" onClick={handleResend}>
             Resend OTP
           </button>
         )}
-
       </div>
-
     </div>
   );
 }
