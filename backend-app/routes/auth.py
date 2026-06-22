@@ -75,23 +75,29 @@ def register():
     }), 201
 
 
-# ================= BREVO EMAIL HELPER =================
+# ================= BREVO EMAIL HELPER (FIXED) =================
 def send_brevo_otp(receiver_email, otp_code):
     """Sends OTP email via Brevo HTTPS REST API to bypass cloud port blocks."""
     url = "https://brevo.com"
     
+    api_key = os.getenv("MAIL_PASSWORD")
+    sender_email = os.getenv("MAIL_DEFAULT_SENDER")
+    
+    # Pre-flight check to see if secrets are actually loaded
+    if not api_key or not sender_email:
+        print("CRITICAL ERROR: Environment secrets missing! Check MAIL_PASSWORD and MAIL_DEFAULT_SENDER.")
+        return False
+        
     headers = {
         "accept": "application/json",
-        # Matches your Hugging Face secret: MAIL_PASSWORD (which holds your Brevo Master API Key)
-        "api-key": os.getenv("MAIL_PASSWORD"),  
+        "api-key": api_key,  
         "content-type": "application/json"
     }
     
     payload = {
         "sender": {
             "name": "AI Personal Tutor", 
-            # Matches your Hugging Face secret: MAIL_DEFAULT_SENDER
-            "email": os.getenv("MAIL_DEFAULT_SENDER")  
+            "email": sender_email  
         },
         "to": [{"email": receiver_email}],
         "subject": "Your Secure Login OTP Verification",
@@ -108,10 +114,17 @@ def send_brevo_otp(receiver_email, otp_code):
     
     try:
         response = requests.post(url, json=payload, headers=headers)
-        # Returns True if Brevo successfully accepts the request (HTTP 200, 201, or 202)
-        return response.status_code in [200, 201, 202]
+        
+        # Check if the API request failed
+        if response.status_code not in:
+            print(f"Brevo API Refused Email. Status Code: {response.status_code}")
+            print(f"Brevo Error Details: {response.text}")
+            return False
+            
+        print(f"Successfully sent OTP to {receiver_email} through Brevo API!")
+        return True
     except Exception as e:
-        print(f"Brevo API network error: {str(e)}")
+        print(f"Brevo API network crash error: {str(e)}")
         return False
 
 
