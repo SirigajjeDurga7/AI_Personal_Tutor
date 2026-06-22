@@ -11,6 +11,9 @@ import bcrypt
 import random
 import jwt
 from pathlib import Path
+import random
+import requests
+
 
 # Load environment variables
 env_path = Path(__file__).resolve().parent.parent / ".env"
@@ -72,8 +75,47 @@ def register():
     }), 201
 
 
-# ================= LOGIN =================
+# ================= BREVO EMAIL HELPER =================
+def send_brevo_otp(receiver_email, otp_code):
+    """Sends OTP email via Brevo HTTPS REST API to bypass cloud port blocks."""
+    url = "https://brevo.com"
+    
+    headers = {
+        "accept": "application/json",
+        # Matches your Hugging Face secret: MAIL_PASSWORD (which holds your Brevo Master API Key)
+        "api-key": os.getenv("MAIL_PASSWORD"),  
+        "content-type": "application/json"
+    }
+    
+    payload = {
+        "sender": {
+            "name": "AI Personal Tutor", 
+            # Matches your Hugging Face secret: MAIL_DEFAULT_SENDER
+            "email": os.getenv("MAIL_DEFAULT_SENDER")  
+        },
+        "to": [{"email": receiver_email}],
+        "subject": "Your Secure Login OTP Verification",
+        "htmlContent": f"""
+        <html>
+            <body>
+                <h2>Login Verification</h2>
+                <p>Your verification OTP code is <strong>{otp_code}</strong>.</p>
+                <p>This code will expire shortly. Do not share it with anyone.</p>
+            </body>
+        </html>
+        """
+    }
+    
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        # Returns True if Brevo successfully accepts the request (HTTP 200, 201, or 202)
+        return response.status_code in [200, 201, 202]
+    except Exception as e:
+        print(f"Brevo API network error: {str(e)}")
+        return False
 
+
+# ================= LOGIN (UPDATED) =================
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -93,7 +135,7 @@ def login():
             "message": "Your account has been blocked by the Administrator."
         }), 403
 
-    # Securely verify password format dynamically (Fixed Indentation)
+    # Securely verify password format dynamically
     db_password = user["password"]
     if isinstance(db_password, str):
         db_password = db_password.encode("utf-8")
@@ -103,21 +145,30 @@ def login():
             "message": "Invalid password"
         }), 401
 
-    # Generate OTP Shortcut for immediate login access
-    otp = "123456"
+    # Generate a secure, random 6-digit dynamic OTP code
+    otp = str(random.randint(100000, 999999))
 
     # Remove old OTPs
     otp_collection.delete_many({"email": email})
 
-    # Store new OTP
+    # Store new dynamic OTP in your database
     otp_collection.insert_one({
         "email": email,
-        "otp": otp
+        "otp": otp,
+        "createdAt": datetime.utcnow()
     })
 
-    # Return success immediately and bypass Brevo's email sender completely
+    # Fire the network request to Brevo to deliver the actual message
+    email_sent = send_brevo_otp(email, otp)
+
+    if not email_sent:
+        return jsonify({
+            "message": "Failed to send verification email. System network issue."
+        }), 500
+
+    # Return standard clean response to frontend without exposing the secret OTP
     return jsonify({
-        "message": "OTP sent successfully (Use code: 123456)",
+        "message": "OTP sent successfully to your registered email.",
         "role": user.get("role", "student"),
         "fullName": user.get("fullName", "User")
     }), 200
