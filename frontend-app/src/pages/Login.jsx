@@ -23,9 +23,12 @@ function Login() {
     e.preventDefault();
 
     try {
-      // Fixed: Pointing to relative path and passing the missing role parameter
+      // Dynamically fetches your live Hugging Face URL space
+      const baseUrl = window.location.origin;
+
+      // Connects directly to the live backend domain
       const response = await axios.post(
-        "/login",
+        `${baseUrl}/login`,
         {
           email: formData.email,
           password: formData.password,
@@ -43,19 +46,19 @@ function Login() {
       });
 
     } catch (error) {
-      console.log("Login Error:", error.response);
-      alert(
-        error.response?.data?.message ||
-        "Login failed"
-      );
+      console.error("Login Network Error Details:", error);
+      
+      if (!error.response) {
+        alert("Network error: Cannot reach the backend. Check Hugging Face build logs.");
+      } else {
+        alert(error.response?.data?.message || "Login failed");
+      }
     }
   };
 
   return (
     <div className="login-container">
-
       <div className="login-card">
-
         <h1>
           {role.charAt(0).toUpperCase() + role.slice(1)} Login
         </h1>
@@ -65,7 +68,6 @@ function Login() {
         </p>
 
         <form onSubmit={handleLogin}>
-
           <input
             type="email"
             name="email"
@@ -87,7 +89,6 @@ function Login() {
           <button type="submit">
             Send OTP
           </button>
-
         </form>
 
         <p className="register-link">
@@ -96,9 +97,7 @@ function Login() {
             Register
           </Link>
         </p>
-
       </div>
-
     </div>
   );
 }
