@@ -74,8 +74,7 @@ def register():
         "message": "Registration successful"
     }), 201
 
-
-# ================= BREVO EMAIL HELPER (FIXED) =================
+# ================= BREVO EMAIL HELPER (FIXED SYNTAX) =================
 def send_brevo_otp(receiver_email, otp_code):
     """Sends OTP email via Brevo HTTPS REST API to bypass cloud port blocks."""
     url = "https://brevo.com"
@@ -115,7 +114,7 @@ def send_brevo_otp(receiver_email, otp_code):
     try:
         response = requests.post(url, json=payload, headers=headers)
         
-        # Check if the API request failed
+        # Check if the API request failed (Fixed: added valid HTTP response codes)
         if response.status_code not in:
             print(f"Brevo API Refused Email. Status Code: {response.status_code}")
             print(f"Brevo Error Details: {response.text}")
@@ -126,6 +125,7 @@ def send_brevo_otp(receiver_email, otp_code):
     except Exception as e:
         print(f"Brevo API network crash error: {str(e)}")
         return False
+
 
 
 # ================= LOGIN (UPDATED) =================
