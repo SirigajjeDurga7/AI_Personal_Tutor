@@ -74,51 +74,45 @@ def register():
         "message": "Registration successful"
     }), 201
 
-# ================= BREVO EMAIL HELPER (NO-BRACKET FIX) =================
+# ================= BREVO EMAIL HELPER (WITH COMPLETE LOGGING) =================
 def send_brevo_otp(receiver_email, otp_code):
-    """Sends OTP email via Brevo HTTPS REST API to bypass cloud port blocks."""
+    """Sends OTP email via Brevo HTTPS REST API and logs precise errors."""
     url = "https://brevo.com"
     
     api_key = os.getenv("MAIL_PASSWORD")
     sender_email = os.getenv("MAIL_DEFAULT_SENDER")
     
-    # Pre-flight check to see if secrets are actually loaded
     if not api_key or not sender_email:
         print("CRITICAL ERROR: Environment secrets missing! Check MAIL_PASSWORD and MAIL_DEFAULT_SENDER.")
         return False
         
     headers = {
         "accept": "application/json",
-        "api-key": api_key,  
+        "api-key": str(api_key).strip(),  # Added .strip() to clean any accidental whitespaces
         "content-type": "application/json"
     }
     
     payload = {
         "sender": {
             "name": "AI Personal Tutor", 
-            "email": sender_email  
+            "email": str(sender_email).strip()  
         },
-        "to": [{"email": receiver_email}],
+        "to": [{"email": str(receiver_email).strip()}],
         "subject": "Your Secure Login OTP Verification",
-        "htmlContent": f"""
-        <html>
-            <body>
-                <h2>Login Verification</h2>
-                <p>Your verification OTP code is <strong>{otp_code}</strong>.</p>
-                <p>This code will expire shortly. Do not share it with anyone.</p>
-            </body>
-        </html>
-        """
+        "htmlContent": f"<html><body><h2>Login Verification</h2><p>Your verification OTP code is <strong>{otp_code}</strong>.</p></body></html>"
     }
     
     try:
-        response = requests.post(url, json=payload, headers=headers)
-        
-        # CHANGED: Using a simple integer comparison instead of brackets to prevent syntax errors
+        print(f"Attempting to send Brevo email from: {sender_email} to: {receiver_email}")
+        response = requests.post(url, json=payload, headers=headers, timeout=15)
         status = response.status_code
+        
         if status < 200 or status > 299:
-            print(f"Brevo API Refused Email. Status Code: {status}")
-            print(f"Brevo Error Details: {response.text}")
+            # THIS IS CRITICAL: This will print the exact reason Brevo rejected it into your logs!
+            print(f"--- BREVO API REJECTION DETAILS ---")
+            print(f"Status Code: {status}")
+            print(f"Response Text: {response.text}")
+            print(f"----------------------------------")
             return False
             
         print(f"Successfully sent OTP to {receiver_email} through Brevo API!")
@@ -126,6 +120,7 @@ def send_brevo_otp(receiver_email, otp_code):
     except Exception as e:
         print(f"Brevo API network crash error: {str(e)}")
         return False
+
 
 
 
