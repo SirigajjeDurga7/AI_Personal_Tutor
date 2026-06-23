@@ -23,7 +23,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      // FIXED: Pointing directly to your live Render backend URL
+      // Pointing directly to your live Render backend URL
       const baseUrl = "https://ai-personal-tutor-owly.onrender.com";
 
       // Connects directly to the live backend domain on Render
@@ -59,11 +59,11 @@ function Login() {
         <p>Welcome back! Sign in to continue.</p>
 
         <form onSubmit={handleLogin}>
-          {/* Note: Kept as text instead of email to cleanly accept international phone formats */}
+          {/* FIXED: Placeholder switched back to Email Address while type text ensures zero formatting blocks */}
           <input
             type="text"
             name="email"
-            placeholder="Mobile Number (e.g. +91XXXXXXXXXX)"
+            placeholder="Email Address"
             required
             value={formData.email}
             onChange={handleChange}
