@@ -33,49 +33,29 @@ groq_client = Groq(
 
 study_plans = db["study_plans"]
 
-# ================= BREVO EMAIL HELPER (CORRECTED API ENDPOINT) =================
-def send_brevo_otp(receiver_email, otp_code):
-    """Sends OTP email via Brevo HTTPS REST API with absolute payload safety."""
-    # FIXED: Changed from "https://brevo.com" to the direct Brevo API engine endpoint
-    url = "https://brevo.com"
+# ================= TWILIO SMS HELPER =================
+def send_sms_otp(receiver_phone, otp_code):
+    """Sends OTP text message via Twilio SMS API."""
+    account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+    auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+    twilio_number = os.getenv("TWILIO_PHONE_NUMBER")
     
-    api_key = os.getenv("MAIL_PASSWORD")
-    sender_email = os.getenv("MAIL_DEFAULT_SENDER")
-
-    
-    if not api_key or not sender_email:
-        print("CRITICAL LOG: Secrets are missing from environment variables!")
+    if not account_sid or not auth_token or not twilio_number:
+        print("CRITICAL LOG: Twilio secrets are missing from environment variables!")
         return False
         
-    headers = {
-        "accept": "application/json",
-        "api-key": str(api_key).strip(),  
-        "content-type": "application/json"
-    }
-    
-    payload = {
-        "sender": {
-            "name": "AI Personal Tutor", 
-            "email": str(sender_email).strip().lower()  
-        },
-        "to": [{"email": str(receiver_email).strip().lower()}],
-        "subject": "Your Secure Login OTP Verification",
-        "htmlContent": f"<html><body><h2>Verification</h2><p>Your OTP code is: <strong>{otp_code}</strong></p></body></html>"
-    }
-    
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=15)
-        current_status = int(response.status_code)
-        
-        # Logs directly to the top line of Render for instant visibility
-        print(f"--- BREVO TRANSACTION LOG --- Status: {current_status} | Response: {response.text}")
-        
-        if current_status >= 200 and current_status <= 299:
-            return True
-            
-        return False
+        client = Client(account_sid, auth_token)
+        # Note: receiver_phone must contain country code (e.g., +91XXXXXXXXXX)
+        message = client.messages.create(
+            body=f"Your AI Personal Tutor login verification code is: {otp_code}",
+            from_=twilio_number,
+            to=str(receiver_phone).strip()
+        )
+        print(f"--- TWILIO TRANSACTION LOG --- Sent successfully. SID: {message.sid}")
+        return True
     except Exception as e:
-        print(f"BREVO EXCEPTION CRASH: {str(e)}")
+        print(f"TWILIO EXCEPTION CRASH: {str(e)}")
         return False
 
 
@@ -86,7 +66,7 @@ def register():
     data = request.get_json()
 
     full_name = data.get("fullName")
-    email = data.get("email")
+    email = data.get("email") # This field will securely store your phone number string (e.g. +91XXXXXXXXXX)
     password = data.get("password")
     role = data.get("role")
 
@@ -119,13 +99,12 @@ def register():
     }), 201
 
 
-# ================= LOGIN (CONNECTED TO BREVO EMAIL SENDER) =================
-# ================= LOGIN (PRODUCTION SAFE BYPASS) =================
+# ================= LOGIN (CONNECTED TO TWILIO SMS) =================
 @auth_bp.route("/login", methods=["POST"])
 def login():
     try:
         data = request.get_json()
-        email = data.get("email")
+        email = data.get("email") # Reads your phone number from the input field
         password = data.get("password")
 
         user = users.find_one({"email": email})
@@ -153,15 +132,24 @@ def login():
             "createdAt": datetime.utcnow()
         })
 
-        # Bypasses Brevo network blocks completely by returning the real code directly in the popup alert
+        # CONNECTED: Fires the live SMS text message directly to your phone using Twilio
+        sms_sent = send_sms_otp(email, otp)
+
+        if not sms_sent:
+            return jsonify({
+                "message": "Failed to send verification SMS. System configuration issue."
+            }), 500
+
+        # Production safe clean response that hides the code from the frontend logs
         return jsonify({
-            "message": f"OTP generated successfully! Your secure code is: {otp}",
+            "message": "OTP sent successfully to your registered mobile number.",
             "role": user.get("role", "student"),
             "fullName": user.get("fullName", "User")
         }), 200
 
     except Exception as e:
         return jsonify({"message": f"Server Error: {str(e)}"}), 500
+
 
 
 
