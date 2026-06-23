@@ -38,7 +38,9 @@ function Register() {
 
     try {
       // FIXED: Switched from 'onrender.com' to your explicit app subdomain
-      const baseUrl = "https://ai-personal-tutor-owly.onrender.com";
+      // FIXED: Automatically tracks and communicates directly with your internal Hugging Face port node
+      const baseUrl = window.location.origin;
+
 
       const response = await axios.post(`${baseUrl}/register`, {
         fullName: formData.fullName,
