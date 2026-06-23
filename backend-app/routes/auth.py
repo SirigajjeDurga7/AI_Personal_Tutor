@@ -38,8 +38,7 @@ study_plans = db["study_plans"]
 
 # ================= BREVO EMAIL HELPER (CORRECTED API ENDPOINT) =================
 def send_brevo_otp(receiver_email, otp_code):
-    """Sends OTP email via Brevo HTTPS REST API with absolute error safety."""
-    # FIX: Corrected from homepage to direct Brevo SMTP email REST API endpoint
+    """Sends OTP email via Brevo HTTPS REST API with absolute payload safety."""
     url = "https://brevo.com"
     
     api_key = os.getenv("MAIL_PASSWORD")
@@ -55,31 +54,32 @@ def send_brevo_otp(receiver_email, otp_code):
         "content-type": "application/json"
     }
     
+    # IMPROVED PAYLOAD: Structured cleanly with minimal tags to prevent validation drops
     payload = {
         "sender": {
             "name": "AI Personal Tutor", 
-            "email": str(sender_email).strip()  
+            "email": str(sender_email).strip().lower()  # Forced lowercase safety check
         },
-        "to": [{"email": str(receiver_email).strip()}],
+        "to": [{"email": str(receiver_email).strip().lower()}],
         "subject": "Your Secure Login OTP Verification",
         "htmlContent": f"<html><body><h2>Verification</h2><p>Your OTP code is: <strong>{otp_code}</strong></p></body></html>"
     }
     
     try:
-        print(f"DEBUGGING LOG: Sending request to Brevo API...")
         response = requests.post(url, json=payload, headers=headers, timeout=15)
         current_status = int(response.status_code)
-        print(f"DEBUGGING LOG: Brevo responded with HTTP Code: {current_status}")
+        
+        # Logs directly to the top line of Render for instant visibility
+        print(f"--- BREVO TRANSACTION LOG --- Status: {current_status} | Response: {response.text}")
         
         if current_status >= 200 and current_status <= 299:
-            print("DEBUGGING LOG: Brevo email delivered successfully!")
             return True
             
-        print(f"DEBUGGING LOG: Brevo API rejected payload. Content details: {response.text}")
         return False
     except Exception as e:
-        print(f"DEBUGGING LOG: Post request crashed completely. Error: {str(e)}")
+        print(f"BREVO EXCEPTION CRASH: {str(e)}")
         return False
+
 
 
 # ================= REGISTER =================
