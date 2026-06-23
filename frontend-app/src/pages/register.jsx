@@ -15,7 +15,7 @@ function Register() {
     confirmPassword: "",
   });
 
-  // NEW: State variables to manage in-card feedback notifications
+  // State variables to manage in-card feedback notifications
   const [statusMessage, setStatusMessage] = useState("");
   const [statusType, setStatusType] = useState(""); // Can be 'success' or 'error'
 
@@ -37,7 +37,8 @@ function Register() {
     }
 
     try {
-      const baseUrl = "https://onrender.com";
+      // FIXED: Switched from 'onrender.com' to your explicit app subdomain
+      const baseUrl = "https://ai-personal-tutor-owly.onrender.com";
 
       const response = await axios.post(`${baseUrl}/register`, {
         fullName: formData.fullName,
@@ -59,9 +60,13 @@ function Register() {
       console.error("Registration Error Details:", error);
       setStatusType("error"); // Show Custom Red Error Box
       
-      setStatusMessage(
-        error.response?.data?.message || "Registration failed. Database connection issue."
-      );
+      if (!error.response) {
+        setStatusMessage("Network error: Cannot reach the backend server on Render.");
+      } else {
+        setStatusMessage(
+          error.response?.data?.message || "Registration failed. Database connection issue."
+        );
+      }
     }
   };
 
@@ -110,7 +115,7 @@ function Register() {
 
           <button type="submit">Register</button>
 
-          {/* NEW: Dynamic Embedded Status Notification Boxes */}
+          {/* Dynamic Embedded Status Notification Boxes */}
           {statusMessage && (
             <div className={`status-box ${statusType}-box`}>
               {statusMessage}
