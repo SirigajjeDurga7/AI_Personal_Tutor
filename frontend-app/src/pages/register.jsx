@@ -23,41 +23,41 @@ function Register() {
   };
 
   const handleRegister = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
+  if (formData.password !== formData.confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
 
-    try {
-      // FIXED: Pointing explicitly to your live Render backend URL
-      const baseUrl = "https://onrender.com";
+  try {
+    const response = await axios.post(
+      "/register",
+      {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role: role,
+      }
+    );
 
-      const response = await axios.post(
-        `${baseUrl}/register`,
-        {
-          fullName: formData.fullName,
-          email: formData.email, // Saves your +91 mobile phone number into the identification field slot
-          password: formData.password,
-          role: role,
-        }
-      );
+    alert(response.data.message);
 
-      alert(response.data.message);
-      navigate(`/login/${role}`);
+    navigate(`/login/${role}`);
 
-    } catch (error) {
-      alert(
-        error.response?.data?.message ||
-        "Registration failed"
-      );
-    }
-  };
+  } catch (error) {
+    alert(
+      error.response?.data?.message ||
+      "Registration failed"
+    );
+  }
+};
 
   return (
     <div className="register-container">
+
       <div className="register-card">
+
         <h1>
           Create {role.charAt(0).toUpperCase() + role.slice(1)} Account
         </h1>
@@ -67,6 +67,7 @@ function Register() {
         </p>
 
         <form onSubmit={handleRegister}>
+
           <input
             type="text"
             name="fullName"
@@ -76,11 +77,10 @@ function Register() {
             onChange={handleChange}
           />
 
-          {/* FIXED: Input type switched to text to allow phone format submissions cleanly */}
           <input
-            type="text"
+            type="email"
             name="email"
-            placeholder="Mobile Number (e.g. +91XXXXXXXXXX)"
+            placeholder="Email Address"
             required
             value={formData.email}
             onChange={handleChange}
@@ -107,6 +107,7 @@ function Register() {
           <button type="submit">
             Register
           </button>
+
         </form>
 
         <p className="login-link">
@@ -115,7 +116,9 @@ function Register() {
             Login
           </Link>
         </p>
+
       </div>
+
     </div>
   );
 }
