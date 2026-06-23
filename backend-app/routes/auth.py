@@ -13,11 +13,6 @@ import jwt
 from pathlib import Path
 import requests
 
-# Load environment variables
-env_path = Path(__file__).resolve().parent.parent / ".env"
-if env_path.exists():
-    load_dotenv(dotenv_path=env_path)
-
 auth_bp = Blueprint("auth", __name__)
 
 # MongoDB Connection
