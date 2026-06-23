@@ -9,17 +9,10 @@ load_dotenv()
 # Point Flask to the 'static' folder where React files will sit
 app = Flask(__name__, static_folder="static", static_url_path="")
 
-# Allow CORS requests from Hugging Face's own domains alongside your local testing environments
+# FIX: Allow all cross-origin requests (*) so your frontend can connect seamlessly from any host platform
 CORS(
     app,
-    resources={r"/*": {"origins": [
-        "http://localhost:5173", 
-        "http://127.0.0.1:5173", 
-        "http://localhost:5174", 
-        "http://127.0.0.1:5174",
-        "*.hf.space",         # Allows Hugging Face direct app embeds
-        "*.huggingface.co"    # Allows Hugging Face main site frame access
-    ]}},
+    resources={r"/*": {"origins": "*"}},
     supports_credentials=True
 )
 
@@ -34,7 +27,7 @@ app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_DEFAULT_SENDER")
 mail = Mail(app)
 app.mail = mail
 
-# --- FRONTEND ROUTING FOR HUGGING FACE ---
+# --- FRONTEND ROUTING ---
 @app.route("/")
 def serve_index():
     return send_from_directory(app.static_folder, "index.html")
@@ -52,6 +45,5 @@ from routes.lms import lms_bp
 app.register_blueprint(lms_bp)
 
 if __name__ == "__main__":
-    # Hugging Face sets a 'PORT' variable automatically (usually 7860). Fallback to 7860 locally.
     port = int(os.getenv("PORT", 7860))
     app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
