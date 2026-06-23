@@ -13,6 +13,10 @@ function VerifyOTP() {
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(30);
 
+  // NEW: State for tracking status feedback notifications
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState(""); // Can be 'success' or 'error'
+
   useEffect(() => {
     if (timer > 0) {
       const interval = setInterval(() => {
@@ -25,21 +29,21 @@ function VerifyOTP() {
 
   const handleVerify = async (e) => {
     e.preventDefault();
+    setStatusMessage(""); // Clear previous alerts on new submit
 
     try {
-      // FIXED: Pointing directly to your live Render backend URL
+      // Pointing directly to your live Render backend URL
       const baseUrl = "https://ai-personal-tutor-owly.onrender.com";
 
       // Connects directly to the live backend domain on Render
-      const response = await axios.post(
-        `${baseUrl}/verify-otp`,
-        {
-          email,
-          otp,
-        }
-      );
+      const response = await axios.post(`${baseUrl}/verify-otp`, {
+        email,
+        otp,
+      });
 
-      alert(response.data.message);
+      // Show Custom Green Success Alert Box
+      setStatusType("success");
+      setStatusMessage(response.data.message);
 
       // Save JWT Token
       localStorage.setItem("token", response.data.token);
@@ -54,30 +58,33 @@ function VerifyOTP() {
         })
       );
 
-      // Navigate based on role
-      if (response.data.role === "student") {
-        navigate("/student/dashboard");
-      } else if (response.data.role === "instructor") {
-        navigate("/instructor/dashboard");
-      } else {
-        navigate("/admin/dashboard");
-      }
+      // Wait 1.5 seconds so the user can read the nice message, then navigate
+      setTimeout(() => {
+        if (response.data.role === "student") {
+          navigate("/student/dashboard");
+        } else if (response.data.role === "instructor") {
+          navigate("/instructor/dashboard");
+        } else {
+          navigate("/admin/dashboard");
+        }
+      }, 1500);
 
     } catch (error) {
       console.error("Verification Network Error Details:", error);
+      setStatusType("error"); // Show Custom Red Error Alert Box
       
       if (!error.response) {
-        alert("Network error: Cannot reach the backend server on Render.");
+        setStatusMessage("Network error: Cannot reach the backend server on Render.");
       } else {
-        alert(error.response?.data?.message || "OTP Verification Failed");
+        setStatusMessage(error.response?.data?.message || "OTP Verification Failed");
       }
     }
   };
 
   const handleResend = () => {
     setTimer(30);
-    // We can implement resend later
-    alert("Please login again to receive a new OTP.");
+    setStatusType("error");
+    setStatusMessage("Please login again to receive a new verification code.");
   };
 
   return (
@@ -85,7 +92,7 @@ function VerifyOTP() {
       <div className="otp-card">
         <h1>Verify OTP</h1>
         <p>Enter the OTP sent to</p>
-        <span>{email}</span>
+        <span className="user-email-display">{email}</span>
 
         <form onSubmit={handleVerify}>
           <input
@@ -97,6 +104,13 @@ function VerifyOTP() {
             required
           />
           <button type="submit">Verify OTP</button>
+
+          {/* NEW: Dynamic Embedded Status Notification Boxes */}
+          {statusMessage && (
+            <div className={`status-box ${statusType}-box`}>
+              {statusMessage}
+            </div>
+          )}
         </form>
 
         {timer > 0 ? (
