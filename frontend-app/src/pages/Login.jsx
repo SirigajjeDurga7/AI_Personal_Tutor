@@ -12,7 +12,7 @@ function Login() {
     password: "",
   });
 
-  // NEW: State for tracking status feedback notifications
+  // State for tracking status feedback notifications
   const [statusMessage, setStatusMessage] = useState("");
   const [statusType, setStatusType] = useState(""); // Can be 'success' or 'error'
 
@@ -28,7 +28,8 @@ function Login() {
     setStatusMessage(""); // Clear previous alerts on new submit
 
     try {
-      const baseUrl = "https://onrender.com";
+      // FIXED: Switched from 'onrender.com' to your explicit app subdomain link string
+      const baseUrl = "https://ai-personal-tutor-owly.onrender.com";
 
       const response = await axios.post(`${baseUrl}/login`, {
         email: formData.email,
@@ -89,7 +90,7 @@ function Login() {
 
           <button type="submit">Send OTP</button>
 
-          {/* NEW: Dynamic Embedded In-Card Notification Boxes */}
+          {/* Dynamic Embedded In-Card Notification Boxes */}
           {statusMessage && (
             <div className={`status-box ${statusType}-box`}>
               {statusMessage}
