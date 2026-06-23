@@ -33,7 +33,9 @@ function VerifyOTP() {
 
     try {
       // Pointing directly to your live Render backend URL
-      const baseUrl = "https://ai-personal-tutor-owly.onrender.com";
+      // FIXED: Automatically tracks and communicates directly with your internal Hugging Face port node
+      const baseUrl = window.location.origin;
+
 
       // Connects directly to the live backend domain on Render
       const response = await axios.post(`${baseUrl}/verify-otp`, {
