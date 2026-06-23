@@ -26,7 +26,6 @@ function Login() {
       // FIXED: Pointing directly to your live Render backend URL
       const baseUrl = "https://ai-personal-tutor-owly.onrender.com";
 
-
       // Connects directly to the live backend domain on Render
       const response = await axios.post(
         `${baseUrl}/login`,
@@ -69,10 +68,11 @@ function Login() {
         </p>
 
         <form onSubmit={handleLogin}>
+          {/* FIXED: Switched type to text to allow phone layout string entry cleanly */}
           <input
-            type="email"
+            type="text"
             name="email"
-            placeholder="Email Address"
+            placeholder="Mobile Number (e.g. +91XXXXXXXXXX)"
             required
             value={formData.email}
             onChange={handleChange}
