@@ -16,10 +16,7 @@ router = APIRouter(
 
 @router.post("/register")
 async def register_user(user: UserRegister):
-
-    existing_user = await db.users.find_one(
-        {"email": user.email}
-    )
+    existing_user = await db.users.find_one({"email": user.email})
 
     if existing_user:
         return {
