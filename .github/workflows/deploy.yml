@@ -7,20 +7,42 @@ on:
 
 jobs:
   sync-to-hub:
-    # FIXED: Switched from 'ubuntu-latest' to a stable fixed tracking version to prevent internal runner Node crashes
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        # FIXED: Switched to v3 to perfectly match older runner execution versions natively
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           lfs: true
 
-      - name: Push to Hugging Face
+       Silber-Smart-Sync Pipeline
+      - name: Auto-Detect and Push to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git remote rm hf || true
-          git remote add hf https://oauth2:$HF_TOKEN@huggingface.co/spaces/SirigajjeDurga/Ai_Personal_Tutor
-          git push hf main --force --prune
+          # Define all possible casing combinations for your Hugging Face space path
+          PATHS=(
+            "SirigajjeDurga/AI_Personal_Tutor"
+            "SirigajjeDurga/Ai_Personal_Tutor"
+            "SirigajjeDurga/AI-Personal-Tutor"
+            "SirigajjeDurga7/AI_Personal_Tutor"
+            "SirigajjeDurga7/Ai_Personal_Tutor"
+            "SirigajjeDurga7/AI-Personal-Tutor"
+          )
+          
+          echo "🚀 Initializing Smart-Sync Pipeline..."
+          
+          for target in "${PATHS[@]}"; do
+            echo "Checking path connection: https://huggingface.co"
+            git remote rm hf || true
+            git remote add hf "https://oauth2:$HF_TOKEN@huggingface.co/spaces/$target"
+            
+            # Test the push connection quietly
+            if git push hf main --force --prune; then
+              echo "🎯 SUCCESS! Your files have successfully synchronized to: $target"
+              exit 0
+            fi
+          done
+          
+          echo "❌ CRITICAL: None of the target space paths matched your Hugging Face account settings."
+          exit 1
