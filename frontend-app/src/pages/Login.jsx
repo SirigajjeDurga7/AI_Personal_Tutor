@@ -12,9 +12,8 @@ function Login() {
     password: "",
   });
 
-  // State for tracking status feedback notifications
   const [statusMessage, setStatusMessage] = useState("");
-  const [statusType, setStatusType] = useState(""); // Can be 'success' or 'error'
+  const [statusType, setStatusType] = useState(""); 
 
   const handleChange = (e) => {
     setFormData({
@@ -25,11 +24,11 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setStatusMessage(""); // Clear previous alerts on new submit
+    setStatusMessage(""); 
 
     try {
-      // FIXED: Pointing directly to your active live Render backend server URL endpoint
-      const baseUrl = "https://onrender.com";
+      // FIXED: Completely drops Render. Now dynamically points back to its own Hugging Face container domain
+      const baseUrl = window.location.origin;
 
       const response = await axios.post(`${baseUrl}/login`, {
         email: formData.email,
@@ -37,14 +36,10 @@ function Login() {
         role: role,
       });
 
-      // Show Custom Green Success Alert Box
       setStatusType("success");
       setStatusMessage(response.data.message);
 
-      // FIXED: Save JWT Session Token right into local storage memory
       localStorage.setItem("token", response.data.token);
-
-      // FIXED: Save current session user data configuration objects
       localStorage.setItem(
         "currentUser",
         JSON.stringify({
@@ -54,7 +49,6 @@ function Login() {
         })
       );
 
-      // FIXED: Bypasses OTP screen steps entirely; directly navigates based on role match
       setTimeout(() => {
         if (response.data.role === "student") {
           navigate("/student/dashboard");
@@ -66,11 +60,11 @@ function Login() {
       }, 1500);
 
     } catch (error) {
-      console.error("Login Network Error Details:", error);
-      setStatusType("error"); // Show Custom Red Error Alert Box
+      console.error("Login Error Details:", error);
+      setStatusType("error"); 
 
       if (!error.response) {
-        setStatusMessage("Network error: Cannot reach the backend server on Render.");
+        setStatusMessage("Network error: Cannot reach the backend database container node.");
       } else {
         setStatusMessage(error.response?.data?.message || "Login failed");
       }
@@ -102,10 +96,8 @@ function Login() {
             onChange={handleChange}
           />
 
-          {/* FIXED: Button text renamed from 'Send OTP' to standard 'Login' */}
           <button type="submit">Login</button>
 
-          {/* Dynamic Embedded In-Card Notification Boxes */}
           {statusMessage && (
             <div className={`status-box ${statusType}-box`}>
               {statusMessage}
