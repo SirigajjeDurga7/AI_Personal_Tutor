@@ -15,10 +15,10 @@ jobs:
           fetch-depth: 0
           lfs: true
 
-      - name: Push to Hugging Face
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
-          # FIXED: Switched to the proper oauth2 authentication format to allow secure file pushing
-          git remote add hf https://oauth2:$HF_TOKEN@huggingface.co/spaces/SirigajjeDurga/Ai_Personal_Tutor
-          git push hf main --force --prune
+      # FIXED: Switched to the official Hugging Face Sync engine to handle credentials natively without errors
+      - name: Push to Hub
+        uses: huggingface/github-action@v1
+        with:
+          hf_token: ${{ secrets.HF_TOKEN }}
+          repo_id: SirigajjeDurga/Ai_Personal_Tutor
+          repo_type: space
