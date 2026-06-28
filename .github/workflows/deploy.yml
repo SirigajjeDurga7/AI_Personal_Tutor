@@ -7,10 +7,12 @@ on:
 
 jobs:
   sync-to-hub:
-    runs-on: ubuntu-latest
+    # FIXED: Switched from 'ubuntu-latest' to a stable fixed tracking version to prevent internal runner Node crashes
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        # FIXED: Switched to v3 to perfectly match older runner execution versions natively
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           lfs: true
@@ -19,9 +21,6 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # FIXED: Clears out old configuration memory to prevent duplicate path errors
           git remote rm hf || true
-          
-          # FIXED: Standardizes the secure token push format natively
           git remote add hf https://oauth2:$HF_TOKEN@huggingface.co/spaces/SirigajjeDurga/Ai_Personal_Tutor
           git push hf main --force --prune
